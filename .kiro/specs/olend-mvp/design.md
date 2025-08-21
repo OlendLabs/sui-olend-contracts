@@ -37,7 +37,6 @@ graph TB
     SDK --> BR
     
     AC --> OR
-    LD --> OR
     BR --> OR
     BR --> IR
     BR --> LQ
@@ -56,11 +55,11 @@ graph TB
 
 ```mermaid
 graph LR
-    account --> oracle
-    oracle --> lending
-    lending --> interest_rate
+    account --> lending
+    account --> borrowing
+    interest_rate --> borrowing
+    oracle --> borrowing
     lending --> borrowing
-    borrowing --> interest_rate
     borrowing --> liquidation_basic
     liquidation_basic --> liquidation_batch
     borrowing --> repayment
