@@ -7,7 +7,7 @@ Olend is a decentralized lending protocol built on the Sui blockchain that provi
 ## Development Phases and Priorities
 
 ### Phase 1 (MVP Core - Highest Priority)
-- **P0 (Critical)**: Account Management System, Oracle Integration, Basic Lending System
+- **P0 (Critical)**: Account Management System, Oracle Integration, Liquidity Management System, Basic Lending System
 - **P1 (High)**: Single-Asset Borrowing Pools, Dynamic Interest Rates, Basic Liquidation
 
 ### Phase 2 (Enhanced Features - Medium Priority)  
@@ -19,7 +19,7 @@ Olend is a decentralized lending protocol built on the Sui blockchain that provi
 ## Dependency Matrix
 
 ```
-Account System (P0) → Oracle Integration (P0) → Lending System (P0) → Borrowing Pools (P1) → Liquidation (P1) → Multi-Asset Pools (P2) → Advanced Features (P3)
+Account System (P0) → Oracle Integration (P0) → Liquidity Management (P0) → Lending System (P0) → Borrowing Pools (P1) → Liquidation (P1) → Multi-Asset Pools (P2) → Advanced Features (P3)
 ```
 
 ## Technical Architecture Requirements
@@ -99,12 +99,38 @@ Account System (P0) → Oracle Integration (P0) → Lending System (P0) → Borr
 - Price validation and sanity checks
 - Decimal precision handling for different asset types
 
-### Requirement 3: Unified Lending System (P0 - Core)
+### Requirement 3: Liquidity Management System (P0 - Foundation)
+
+**User Story:** As a protocol participant, I want unified liquidity management so that capital efficiency is maximized across all lending and borrowing operations.
+
+**Priority:** P0 (Critical) - Foundation for capital efficiency
+**Dependencies:** Account Management System, Oracle Integration
+**Module:** liquidity.move
+
+#### Acceptance Criteria
+
+1. WHEN assets are deposited THEN the system SHALL add them to unified liquidity pools for maximum capital efficiency
+2. WHEN liquidity is needed for lending THEN the system SHALL allocate from unified pools with proper tracking
+3. WHEN liquidity is needed for borrowing THEN the system SHALL ensure sufficient availability across all operations
+4. WHEN liquidity is returned THEN the system SHALL update unified pool balances and utilization metrics
+5. IF liquidity utilization exceeds safe thresholds THEN the system SHALL implement utilization controls
+6. WHEN calculating yields THEN the system SHALL distribute returns based on unified pool contributions
+7. WHEN emergency conditions occur THEN the system SHALL support liquidity freezing with governance controls
+
+#### Technical Specifications
+
+- LiquidityPool<T>: Unified pool for each asset type with cross-protocol sharing
+- Liquidity provider position tracking with proportional share calculations
+- Real-time utilization monitoring and optimization algorithms
+- Dynamic liquidity allocation between lending and borrowing operations
+- Gas-optimized liquidity management with batch operations
+
+### Requirement 4: Unified Lending System (P0 - Core)
 
 **User Story:** As a lender, I want to deposit assets into unified liquidity pools so that I can earn yield while providing maximum capital efficiency across the platform.
 
 **Priority:** P0 (Critical) - Core lending functionality
-**Dependencies:** Account Management System, Oracle Integration
+**Dependencies:** Account Management System, Oracle Integration, Liquidity Management System
 **Module:** lending.move
 
 #### Acceptance Criteria
@@ -126,12 +152,12 @@ Account System (P0) → Oracle Integration (P0) → Lending System (P0) → Borr
 - Support for multiple asset types with independent interest rate curves
 - Gas-optimized batch operations for multiple deposits/withdrawals
 
-### Requirement 4: Single-Asset Borrowing Pools (P1 - High Priority)
+### Requirement 5: Single-Asset Borrowing Pools (P1 - High Priority)
 
 **User Story:** As a borrower, I want to use my deposited assets as collateral to borrow different assets so that I can access liquidity while maintaining my positions.
 
 **Priority:** P1 (High) - Core borrowing functionality
-**Dependencies:** Account Management, Oracle Integration, Unified Lending System
+**Dependencies:** Account Management, Oracle Integration, Liquidity Management System, Unified Lending System
 **Module:** borrowing.move
 
 #### Acceptance Criteria
@@ -153,7 +179,7 @@ Account System (P0) → Oracle Integration (P0) → Lending System (P0) → Borr
 - Integration with lending pools for liquidity management
 - Support for multiple pools with same asset pairs but different parameters
 
-### Requirement 5: Multi-Asset Borrowing Pools (P2 - Medium Priority)
+### Requirement 6: Multi-Asset Borrowing Pools (P2 - Medium Priority)
 
 **User Story:** As an advanced borrower, I want to use multiple collateral types and borrow multiple assets simultaneously so that I can optimize my capital efficiency.
 
@@ -178,12 +204,12 @@ Account System (P0) → Oracle Integration (P0) → Lending System (P0) → Borr
 - Complex position management with multiple asset tracking
 - Advanced risk calculations for multi-asset scenarios
 
-### Requirement 6: Dynamic Interest Rate Management (P1 - High Priority)
+### Requirement 7: Dynamic Interest Rate Management (P1 - High Priority)
 
 **User Story:** As a platform participant, I want interest rates to adjust dynamically based on utilization so that the protocol maintains optimal liquidity and fair pricing.
 
 **Priority:** P1 (High) - Essential for sustainable economics
-**Dependencies:** Unified Lending System, Single-Asset Borrowing Pools
+**Dependencies:** Liquidity Management System, Unified Lending System, Single-Asset Borrowing Pools
 **Module:** interest_rate.move
 
 #### Acceptance Criteria
@@ -207,7 +233,7 @@ Account System (P0) → Oracle Integration (P0) → Lending System (P0) → Borr
 - Reserve factor for protocol revenue (5-25% of interest)
 - Gas-optimized rate calculations
 
-### Requirement 7: Fixed Interest Rate System (P3 - Lower Priority)
+### Requirement 8: Fixed Interest Rate System (P3 - Lower Priority)
 
 **User Story:** As a borrower seeking predictable costs, I want access to fixed-rate borrowing so that I can plan my financial obligations with certainty.
 
@@ -223,12 +249,12 @@ Account System (P0) → Oracle Integration (P0) → Lending System (P0) → Borr
 4. IF fixed-rate pool has no borrowers THEN the system SHALL allow rate modifications by governance
 5. WHEN comparing rates THEN the system SHALL display both fixed and floating options to users
 
-### Requirement 8: Collateralized Borrowing Operations (P1 - High Priority)
+### Requirement 9: Collateralized Borrowing Operations (P1 - High Priority)
 
 **User Story:** As a borrower, I want to provide collateral and borrow assets based on oracle prices so that I can access liquidity without selling my holdings.
 
 **Priority:** P1 (High) - Core borrowing mechanics
-**Dependencies:** Account Management, Oracle Integration, Single-Asset Borrowing Pools, Interest Rate Management
+**Dependencies:** Account Management, Oracle Integration, Liquidity Management System, Single-Asset Borrowing Pools, Interest Rate Management
 **Module:** borrowing_operations.move
 
 #### Acceptance Criteria
@@ -250,7 +276,7 @@ Account System (P0) → Oracle Integration (P0) → Lending System (P0) → Borr
 - Integration with account system for position tracking
 - Gas-optimized calculations with overflow protection
 
-### Requirement 9: Flexible Repayment System (P1 - High Priority)
+### Requirement 10: Flexible Repayment System (P1 - High Priority)
 
 **User Story:** As a borrower, I want to repay my loans partially or fully with automatic interest calculation so that I can manage my debt positions flexibly.
 
@@ -277,7 +303,7 @@ Account System (P0) → Oracle Integration (P0) → Lending System (P0) → Borr
 - Collateral release mechanisms with proper validation
 - Integration with pool liquidity management
 
-### Requirement 10: Basic Liquidation System (P1 - High Priority)
+### Requirement 11: Basic Liquidation System (P1 - High Priority)
 
 **User Story:** As a protocol participant, I want underwater positions to be liquidated efficiently so that the protocol maintains solvency and lenders are protected.
 
@@ -303,7 +329,7 @@ Account System (P0) → Oracle Integration (P0) → Lending System (P0) → Borr
 - Integration with DeepBook for collateral disposal (future enhancement)
 - Gas-optimized liquidation operations
 
-### Requirement 11: Tick-Based Batch Liquidation (P2 - Medium Priority)
+### Requirement 12: Tick-Based Batch Liquidation (P2 - Medium Priority)
 
 **User Story:** As a liquidator, I want to efficiently liquidate multiple risky positions simultaneously with minimal penalties so that I can maximize efficiency while maintaining protocol health.
 
@@ -329,7 +355,7 @@ Account System (P0) → Oracle Integration (P0) → Lending System (P0) → Borr
 - Reduced liquidation penalties for batch operations
 - Automated tick boundary monitoring
 
-### Requirement 12: Borrowing Term Management (P2 - Medium Priority)
+### Requirement 13: Borrowing Term Management (P2 - Medium Priority)
 
 **User Story:** As a borrower, I want to choose between indefinite and fixed-term borrowing so that I can select the loan structure that best fits my financial planning needs.
 
@@ -354,7 +380,7 @@ Account System (P0) → Oracle Integration (P0) → Lending System (P0) → Borr
 - Automated term monitoring and enforcement
 - Integration with liquidation systems for term-based triggers
 
-### Requirement 13: Revenue Distribution System (P2 - Medium Priority)
+### Requirement 14: Revenue Distribution System (P2 - Medium Priority)
 
 **User Story:** As a stakeholder, I want transparent and automated revenue distribution so that all parties receive appropriate compensation and the protocol maintains adequate reserves.
 
@@ -380,7 +406,7 @@ Account System (P0) → Oracle Integration (P0) → Lending System (P0) → Borr
 - Transparent accounting with detailed event emission
 - Governance integration for parameter adjustments
 
-### Requirement 14: Looping Mechanisms (P3 - Lower Priority)
+### Requirement 15: Looping Mechanisms (P3 - Lower Priority)
 
 **User Story:** As an advanced user, I want to create leveraged positions through automated borrowing and re-depositing so that I can amplify my exposure to specific assets.
 
@@ -406,22 +432,23 @@ Account System (P0) → Oracle Integration (P0) → Lending System (P0) → Borr
 
 ## Implementation Roadmap
 
-### Phase 1 (MVP - 8-12 weeks)
+### Phase 1 (MVP - 10-14 weeks)
 1. **Week 1-2**: Account Management System (P0)
 2. **Week 2-3**: Oracle Integration (P0) 
-3. **Week 3-5**: Unified Lending System (P0)
-4. **Week 5-7**: Single-Asset Borrowing Pools (P1)
-5. **Week 7-8**: Dynamic Interest Rates (P1)
-6. **Week 8-10**: Collateralized Borrowing Operations (P1)
-7. **Week 10-11**: Flexible Repayment System (P1)
-8. **Week 11-12**: Basic Liquidation System (P1)
+3. **Week 3-5**: Liquidity Management System (P0)
+4. **Week 5-7**: Unified Lending System (P0)
+5. **Week 7-9**: Single-Asset Borrowing Pools (P1)
+6. **Week 9-10**: Dynamic Interest Rates (P1)
+7. **Week 10-12**: Collateralized Borrowing Operations (P1)
+8. **Week 12-13**: Flexible Repayment System (P1)
+9. **Week 13-14**: Basic Liquidation System (P1)
 
 ### Phase 2 (Enhanced Features - 6-8 weeks)
-1. **Week 13-15**: Multi-Asset Borrowing Pools (P2)
-2. **Week 15-17**: Tick-Based Batch Liquidation (P2)
-3. **Week 17-19**: Borrowing Term Management (P2)
-4. **Week 19-20**: Revenue Distribution System (P2)
+1. **Week 15-17**: Multi-Asset Borrowing Pools (P2)
+2. **Week 17-19**: Tick-Based Batch Liquidation (P2)
+3. **Week 19-21**: Borrowing Term Management (P2)
+4. **Week 21-22**: Revenue Distribution System (P2)
 
 ### Phase 3 (Advanced Features - 4-6 weeks)
-1. **Week 21-23**: Fixed Interest Rate System (P3)
-2. **Week 23-26**: Looping Mechanisms (P3)
+1. **Week 23-25**: Fixed Interest Rate System (P3)
+2. **Week 25-28**: Looping Mechanisms (P3)

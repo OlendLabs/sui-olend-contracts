@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install Sui CLI
+      run: |
+        curl -fLJO https://github.com/MystenLabs/sui/releases/download/testnet-v1.14.2/sui-testnet-v1.14.2-ubuntu-x86_64.tgz
+        tar -xzf sui-testnet-v1.14.2-ubuntu-x86_64.tgz
+        sudo mv sui-testnet-v1.14.2-ubuntu-x86_64/sui /usr/local/bin/
+        sudo chmod +x /usr/local/bin/sui
+    
+    - name: Verify Sui installation
+      run: sui --version
+    
+    - name: Build project
+      run: sui move build
+    
+    - name: Run tests
+      run: sui move test --coverage
+    
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      if: always()
+      with:
+        files: ./coverage/lcov.info
+        fail_ci_if_error: false
+
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install Sui CLI
+      run: |
+        curl -fLJO https://github.com/MystenLabs/sui/releases/download/testnet-v1.14.2/sui-testnet-v1.14.2-ubuntu-x86_64.tgz
+        tar -xzf sui-testnet-v1.14.2-ubuntu-x86_64.tgz
+        sudo mv sui-testnet-v1.14.2-ubuntu-x86_64/sui /usr/local/bin/
+        sudo chmod +x /usr/local/bin/sui
+    
+    - name: Check code formatting
+      run: |
+        # Add formatting checks when available in Sui CLI
+        echo "Code formatting check placeholder"
+    
+    - name: Security audit
+      run: |
+        # Add security audit tools when available
+        echo "Security audit placeholder"

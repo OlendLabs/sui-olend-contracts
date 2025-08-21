@@ -1,0 +1,13 @@
+[package]
+name = "olend"
+version = "1.0.0"
+edition = "2024.beta"
+
+[dependencies]
+
+[addresses]
+olend = "0x0"
+
+[dev-dependencies]
+
+[dev-addresses]
